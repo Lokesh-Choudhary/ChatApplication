@@ -9,3 +9,14 @@ body {
     min-height: 100vh;
     background-color: rgb(240, 206, 156) ;
 }
+
+.chats-container {
+    width: 31%;
+    overflow: hidden;
+  }
+  
+  .chat-list {
+    overflow-y: auto;
+    padding-right: 15px;
+  }
+  
