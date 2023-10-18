@@ -6,14 +6,13 @@ const connectDB = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const {notFound ,errorHandler} = require('./middlewares/errorMiddleware')
-
+const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
 dotenv.config();
 const app = express();
 connectDB();
 
-app.use(express.json()); 
+app.use(express.json());
 app.use(cors());
 
 app.get('/', (req, res) => {
@@ -33,15 +32,14 @@ app.get('/api/chat/:id', (req, res) => {
   }
 });
 
-
-
 app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
-// app.use('/api/message', messageRoutes);
+app.use('/api/message', messageRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT 
 
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
