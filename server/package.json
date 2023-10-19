@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm start",
-    "server": "node server.js",
-    "build": "npm run build"
+    "start": "node server/server.js",
+    "server": "nodemon server.js",
+    "build": "npm install && npm install client && npm run build"
   },
   "keywords": [],
   "author": "",
