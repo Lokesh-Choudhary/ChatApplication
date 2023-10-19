@@ -264,7 +264,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         >
           <Center height="90vh">
             <Text fontSize="3xl" pb={3} fontFamily="Work Sans">
-              <b>Click On A User To Start Chatting....</b>
+              <b>Click On A User To Start Chatting.....</b>
             </Text>
           </Center>
         </Box>
