@@ -28,11 +28,21 @@ import ProfileModal from "../OtherMiscellaneous/ProfileModal";
 import UserListItem from "../UserAvators/UserListItem";
 import ChatLoading from "../OtherMiscellaneous/ChatLoading";
 import axios from "axios";
+import { getSender } from "../../config/ChatLogic";
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
 
 const SideDrawer = () => {
   const history = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
@@ -141,8 +151,30 @@ const SideDrawer = () => {
           </Text>
 
           <Flex alignItems="center">
-            <BellIcon fontSize="3xl" mr={2} />
             <Menu>
+              <MenuButton p={"1"}>
+                <NotificationBadge
+                  count={notification.length}
+                  effect={Effect.scale}
+                />
+                <BellIcon fontSize="3xl" mr={0} />
+              </MenuButton>
+              <MenuList pl={"2"}>
+                {!notification.length && " NO NEW MESSAGES"}
+                {notification.map((notif) => (
+                  <MenuItem
+                    key={notif._id}
+                    onClick={() => {
+                      setSelectedChat(notif.chat);
+                      setNotification(notification.filter((n) => n !== notif));
+                    }}
+                  >
+                    {notif.chat.isGroupChat
+                      ? `New Message in ${notif.chat.chatName}`
+                      : `New Message From ${getSender(user, notif.chat.users)}`}
+                  </MenuItem>
+                ))}
+              </MenuList>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                 <Avatar
                   size="sm"

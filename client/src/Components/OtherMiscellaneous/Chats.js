@@ -1,9 +1,9 @@
+import React, { useEffect, useState } from "react";
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Stack, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { getSender } from '../../config/ChatLogic';
+import { getSender } from "../../config/ChatLogic";
 import ChatLoading from "../OtherMiscellaneous/ChatLoading";
 import GroupChatModal from "../OtherMiscellaneous/GroupChatModal";
 import { Button } from "@chakra-ui/react";
@@ -37,9 +37,39 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
-    fetchChats();
-    // eslint-disable-next-line
+    const fetchData = async () => {
+      const userInfo = localStorage.getItem("userInfo");
+
+      if (!userInfo) {
+        return;
+      }
+
+      const user = JSON.parse(userInfo);
+      setLoggedUser(user);
+
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+
+        const { data } = await axios.get("/api/chat", config);
+        setChats(data);
+      } catch (error) {
+        toast({
+          title: "Error Occurred!",
+          description: "Failed to load the chats",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAgain]);
 
   return (
@@ -60,19 +90,20 @@ const MyChats = ({ fetchAgain }) => {
         fontFamily="Work sans"
         display="flex"
         width="100%"
-        justifyContent="space-between"
+        justifyContent="space between"
         alignItems="center"
         borderRadius="lg"
       >
-        My Chats
+       <b> My Chats</b>
         <GroupChatModal>
-          <Button
-            display="flex"
-            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-            rightIcon={<AddIcon />}
-          >
-            New Group Chat
-          </Button>
+          <Box display="flex" justifyContent="flex-start" paddingLeft={'10px'} width="100%">
+            <Button
+              fontSize={{ base: "25px", md: "10px", lg: "17px" }}
+              rightIcon={<AddIcon />}
+            >
+              New Group Chat
+            </Button>
+          </Box>
         </GroupChatModal>
       </Box>
       <Box
@@ -83,7 +114,7 @@ const MyChats = ({ fetchAgain }) => {
         width="100%"
         height="100%"
         borderRadius="lg"
-        overflowY="auto" 
+        overflowY="auto"
       >
         {chats ? (
           <Stack>

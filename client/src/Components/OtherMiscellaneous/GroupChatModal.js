@@ -31,12 +31,16 @@ const GroupChatModal = ({ children }) => {
 
   useEffect(() => {
     if (!isOpen) {
-      setGroupChatName('');
-      setSelectedUsers([]);
-      setSearch('');
-      setSearchResult([]);
+      resetModalState();
     }
   }, [isOpen]);
+
+  const resetModalState = () => {
+    setGroupChatName('');
+    setSelectedUsers([]);
+    setSearch('');
+    setSearchResult([]);
+  };
 
   const handleSearch = async (query) => {
     setSearch(query);
@@ -53,24 +57,24 @@ const GroupChatModal = ({ children }) => {
         },
       };
       const { data } = await axios.get(`/api/user?search=${query}`, config);
-      setLoading(false);
       setSearchResult(data);
     } catch (error) {
       handleAxiosError(error, 'Failed to Load the Search Results');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGroup = (userToAdd) => {
-    if (selectedUsers.some((user) => user._id === userToAdd._id)) {
-      toastUserAlreadyAdded();
-      return;
-    }
-    setSelectedUsers([...selectedUsers, userToAdd]);
-  };
-
-  const handleDelete = (userToRemove) => {
-    const updatedUsers = selectedUsers.filter((user) => user._id !== userToRemove._id);
-    setSelectedUsers(updatedUsers);
+  const handleAxiosError = (error, description) => {
+    console.error(error);
+    toast({
+      title: 'Error Occurred',
+      description,
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+      position: 'bottom-left',
+    });
   };
 
   const handleSubmit = async () => {
@@ -78,6 +82,7 @@ const GroupChatModal = ({ children }) => {
       toastValidationError('Please Fill All The Details');
       return;
     }
+
     try {
       const config = {
         headers: {
@@ -98,18 +103,6 @@ const GroupChatModal = ({ children }) => {
     }
   };
 
-  const handleAxiosError = (error, description) => {
-    console.error(error);
-    toast({
-      title: 'Error Occurred',
-      description,
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-      position: 'bottom-left',
-    });
-  };
-
   const toastValidationError = (message) => {
     toast({
       title: message,
@@ -120,6 +113,24 @@ const GroupChatModal = ({ children }) => {
     });
   };
 
+  const handleChatCreationResponse = (data) => {
+    resetModalState();
+    onClose();
+  };
+
+  const handleGroup = (userToAdd) => {
+    if (selectedUsers.some((user) => user._id === userToAdd._id)) {
+      toastUserAlreadyAdded();
+      return;
+    }
+    setSelectedUsers([...selectedUsers, userToAdd]);
+  };
+
+  const handleDelete = (userToRemove) => {
+    const updatedUsers = selectedUsers.filter((user) => user._id !== userToRemove._id);
+    setSelectedUsers(updatedUsers);
+  };
+
   const toastUserAlreadyAdded = () => {
     toast({
       title: 'User already added',
@@ -128,15 +139,6 @@ const GroupChatModal = ({ children }) => {
       isClosable: true,
       position: 'top',
     });
-  };
-
-  const handleChatCreationResponse = (data) => {
-    
-    setGroupChatName('');
-    setSelectedUsers([]);
-    setSearch('');
-    setSearchResult([]);
-    onClose();
   };
 
   return (
@@ -169,7 +171,7 @@ const GroupChatModal = ({ children }) => {
               <UserBadgeItem key={user._id} user={user} handleFunction={() => handleDelete(user)} />
             ))}
             {loading ? (
-              <div fontFamily={'Work sans'} style={{ color: 'blue' }}>
+              <div key="loading" style={{ fontFamily: 'Work sans', color: 'blue' }}>
                 Loading
               </div>
             ) : (
